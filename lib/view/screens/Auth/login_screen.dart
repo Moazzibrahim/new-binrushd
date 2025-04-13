@@ -1,11 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:binrushd_medical_center/view/screens/tabs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:binrushd_medical_center/constants/constants.dart';
 import 'package:binrushd_medical_center/controller/Auth/login_provider.dart';
 import 'package:binrushd_medical_center/view/screens/Auth/forget_password/forget_password_screen.dart';
 import 'package:binrushd_medical_center/view/screens/Auth/sign_up_screen.dart';
-import 'package:binrushd_medical_center/view/screens/home_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -355,7 +355,7 @@ class _LoginScreenState extends State<LoginScreen> {
           } else if (index == 1) {
             // Guest login action
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const HomePage()));
+                MaterialPageRoute(builder: (context) => const TabsScreen()));
           } else if (index == 2) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const SignUpScreen()));

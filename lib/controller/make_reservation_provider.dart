@@ -51,6 +51,8 @@ class MakeReservationProvider with ChangeNotifier {
             content: Text(" تم الحجز بنجاح تفقد حسابك للتأكيد ")));
       } else {
         print('Request failed: ${response.statusCode}');
+        ScaffoldMessenger.of(context!).showSnackBar(
+            const SnackBar(content: Text(" حدث خطأ ما حاول مرة اخرى ")));
         // Handle error response
       }
     } catch (e) {

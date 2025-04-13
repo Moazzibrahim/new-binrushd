@@ -1,9 +1,11 @@
-// ignore_for_file: use_build_context_synchronously, unnecessary_null_comparison, library_private_types_in_public_api
+// ignore_for_file: use_build_context_synchronously, unnecessary_null_comparison, library_private_types_in_public_api, deprecated_member_use
 import 'package:binrushd_medical_center/controller/Auth/login_provider.dart';
 import 'package:binrushd_medical_center/controller/profile_provider.dart';
 import 'package:binrushd_medical_center/view/screens/branches/branch_details_screen.dart';
 import 'package:binrushd_medical_center/view/screens/doctors/doctor_details_screen.dart';
 import 'package:binrushd_medical_center/view/screens/specializies/specializies_details_screen.dart';
+import 'package:binrushd_medical_center/view/widgets/filter_button_widget.dart';
+import 'package:binrushd_medical_center/view/widgets/show_signup_dialog_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:binrushd_medical_center/constants/constants.dart';
@@ -58,11 +60,14 @@ class _HomePageState extends State<HomePage> {
 
     // Call the API to fetch profile data when the screen is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (profileProvider.authUserResponse == null) {
-        profileProvider.fetchProfile(
-          token: token!, // Replace with the actual token
-          context: context,
-        );
+      if (token != null && token.isNotEmpty) {
+        // ✅ Check if token is not null
+        if (profileProvider.authUserResponse == null) {
+          profileProvider.fetchProfile(
+            token: token,
+            context: context,
+          );
+        }
       }
     });
 
@@ -90,12 +95,22 @@ class _HomePageState extends State<HomePage> {
                       EdgeInsets.symmetric(vertical: 5.h, horizontal: 18.w),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MakeAppointmentScreen(),
-                    ),
-                  );
+                  if (token == null || token.isEmpty) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const CustomAlertDialog(
+                        title: 'تنبيه',
+                        message: 'يجب التسجيل بحساب لكي تحجز موعد',
+                      ),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MakeAppointmentScreen(),
+                      ),
+                    );
+                  }
                 },
                 child: Text(
                   'حجز موعد',
@@ -141,64 +156,6 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Search and Button
-              // Padding(
-              //   padding: const EdgeInsets.all(16.0),
-              //   child: Row(
-              //     children: [
-              //       // Stack(
-              //       //   children: [
-              //       //     IconButton(
-              //       //       icon: const Icon(Icons.notifications),
-              //       //       onPressed: () {
-              //       //         Navigator.push(
-              //       //             context,
-              //       //             MaterialPageRoute(
-              //       //                 builder: (context) =>
-              //       //                     const NotificationsScreen()));
-              //       //       },
-              //       //     ),
-              //       //     Positioned(
-              //       //       right: 8,
-              //       //       top: 8,
-              //       //       child: Container(
-              //       //         padding: const EdgeInsets.all(4),
-              //       //         decoration: BoxDecoration(
-              //       //           color: backgroundColor,
-              //       //           shape: BoxShape.circle,
-              //       //         ),
-              //       //         child: Text(
-              //       //           '3',
-              //       //           style: TextStyle(
-              //       //             color: Colors.white,
-              //       //             fontSize: 12.sp,
-              //       //           ),
-              //       //         ),
-              //       //       ),
-              //       //     ),
-              //       //   ],
-              //       // ),
-              //       const SizedBox(width: 15),
-              //       Expanded(
-              //         child: TextField(
-              //           textAlign: TextAlign.right,
-              //           decoration: InputDecoration(
-              //             hintText: 'ابحث هنا',
-              //             hintStyle: const TextStyle(
-              //                 fontSize: 10, fontWeight: FontWeight.w400),
-              //             suffixIcon: const Icon(Icons.search),
-              //             border: OutlineInputBorder(
-              //               borderSide: BorderSide.none,
-              //               borderRadius: BorderRadius.circular(10),
-              //             ),
-              //             filled: true,
-              //             fillColor: Colors.white,
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
               // Image Banner
               Consumer<FetchOffersProvider>(
                 builder: (context, provider, child) {
@@ -655,13 +612,28 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                           onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
+                                            if (token == null ||
+                                                token.isEmpty) {
+                                              showDialog(
+                                                context: context,
                                                 builder: (context) =>
-                                                    const MakeAppointmentScreen(),
-                                              ),
-                                            );
+                                                    const CustomAlertDialog(
+                                                  title: 'تنبيه',
+                                                  message:
+                                                      'يجب التسجيل بحساب لكي تحجز موعد',
+                                                ),
+                                              );
+                                            } else {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      MakeAppointmentScreen(
+                                                    docid: doctor.id,
+                                                  ),
+                                                ),
+                                              );
+                                            }
                                           },
                                           child: const Text(
                                             'حجز موعد',
@@ -816,13 +788,26 @@ class _HomePageState extends State<HomePage> {
                                               minimumSize: const Size(100, 40),
                                             ),
                                             onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
+                                              if (token == null ||
+                                                  token.isEmpty) {
+                                                showDialog(
+                                                  context: context,
                                                   builder: (context) =>
-                                                      const MakeAppointmentScreen(),
-                                                ),
-                                              );
+                                                      const CustomAlertDialog(
+                                                    title: 'تنبيه',
+                                                    message:
+                                                        'يجب التسجيل بحساب لكي تحجز موعد',
+                                                  ),
+                                                );
+                                              } else {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const MakeAppointmentScreen(),
+                                                  ),
+                                                );
+                                              }
                                             },
                                             child: const Text(
                                               'حجز موعد',
@@ -985,148 +970,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-class FilterButton extends StatefulWidget {
-  final String label;
-  final Color? backgroundColor;
-  final bool isSelected;
-  final String image;
-  final VoidCallback onTap;
-
-  const FilterButton({
-    required this.label,
-    this.backgroundColor,
-    this.isSelected = false,
-    required this.image,
-    super.key,
-    required this.onTap,
-  });
-
-  @override
-  _FilterButtonState createState() => _FilterButtonState();
-}
-
-class _FilterButtonState extends State<FilterButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _scaleAnimation =
-        Tween<double>(begin: 1.0, end: 1.2).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
-  }
-
-  void _animate() {
-    _controller.forward().then((value) => _controller.reverse());
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    const dartRedColor = Color.fromRGBO(149, 0, 0, 1.0);
-    return GestureDetector(
-      onTap: () {
-        _animate();
-        widget.onTap();
-      },
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 13),
-          decoration: BoxDecoration(
-            color: widget.backgroundColor,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: [
-              Text(
-                widget.label,
-                style: TextStyle(
-                  color: widget.isSelected ? dartRedColor : Colors.black,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Image.asset(
-                width: 14,
-                widget.image,
-                color: widget.isSelected ? dartRedColor : Colors.black,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-Widget buildArticleCard(BuildContext context,
-    {required String content,
-    required String title,
-    required String imageUrl}) {
-  return Card(
-    elevation: 2,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.black,
-                  ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.right,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  content,
-                  style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w400),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              imageUrl,
-              width: 90,
-              height: 90,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 }

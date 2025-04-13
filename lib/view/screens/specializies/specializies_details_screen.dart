@@ -1,7 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:binrushd_medical_center/controller/Auth/login_provider.dart';
 import 'package:binrushd_medical_center/controller/fetch_departments_provider.dart';
 import 'package:binrushd_medical_center/view/screens/appointments/make_appointments_screen.dart';
+import 'package:binrushd_medical_center/view/widgets/show_signup_dialog_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -71,6 +73,8 @@ class _SpecializiesDetailsScreenState extends State<SpecializiesDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final logProvider = Provider.of<LoginProvider>(context, listen: false);
+    final token = logProvider.token;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -161,12 +165,22 @@ class _SpecializiesDetailsScreenState extends State<SpecializiesDetailsScreen> {
               padding: const EdgeInsets.all(12.0),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MakeAppointmentScreen(),
-                    ),
-                  );
+                  if (token == null || token.isEmpty) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const CustomAlertDialog(
+                        title: 'تنبيه',
+                        message: 'يجب التسجيل بحساب لكي تحجز موعد',
+                      ),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MakeAppointmentScreen(),
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromRGBO(149, 0, 0, 1),

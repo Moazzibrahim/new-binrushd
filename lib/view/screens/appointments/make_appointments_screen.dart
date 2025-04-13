@@ -9,7 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:binrushd_medical_center/controller/make_reservation_provider.dart';
 
 class MakeAppointmentScreen extends StatefulWidget {
-  const MakeAppointmentScreen({super.key});
+  final int? docid;
+  const MakeAppointmentScreen({this.docid, super.key});
 
   @override
   _MakeAppointmentScreenState createState() => _MakeAppointmentScreenState();
@@ -26,7 +27,9 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch branches when the screen is initialized
+    if (widget.docid != null) {
+      __selectedDoctorId = widget.docid.toString();
+    }
     Provider.of<FetchBranchesProvider>(context, listen: false)
         .fetchBranches(context);
     Provider.of<FetchDoctorsDataProvider>(context, listen: false)
@@ -94,10 +97,8 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
                   });
                 },
                 items: const [
-                  DropdownMenuItem(value: "internet", child: Text("internet")),
-                  DropdownMenuItem(value: "sms", child: Text("sms")),
-                  DropdownMenuItem(
-                      value: "WordOfMouth", child: Text("WordOfMouth")),
+                  DropdownMenuItem(value: "internet", child: Text("الانترنت")),
+                  DropdownMenuItem(value: "sms", child: Text("رسايل")),
                 ],
               ),
               const SizedBox(height: 16),
@@ -117,21 +118,25 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 16),
-              _buildDropdown(
-                label: "اختار الطبيب",
-                value: __selectedDoctorId,
-                onChanged: (value) {
-                  setState(() {
-                    __selectedDoctorId = value;
-                  });
-                },
-                items: doctors.map((doctor) {
-                  return DropdownMenuItem<String>(
-                    value: doctor.id.toString(), // Store the ID
-                    child: Text("${doctor.fname} ${doctor.lname}"),
-                  );
-                }).toList(),
-              ),
+              if (widget.docid == null)
+                _buildDropdown(
+                  label: "اختار الطبيب",
+                  value: __selectedDoctorId,
+                  onChanged: widget.docid != null
+                      ? (_) {} // Provide a dummy function to make it non-null
+                      : (value) {
+                          setState(() {
+                            __selectedDoctorId = value;
+                          });
+                        },
+                  items: doctors.map((doctor) {
+                    return DropdownMenuItem<String>(
+                      value: doctor.id.toString(),
+                      child: Text("${doctor.fname} ${doctor.lname}"),
+                    );
+                  }).toList(),
+                  isEnabled: widget.docid == null, // <- Add this flag
+                ),
               const SizedBox(height: 32),
               Center(
                 child: ElevatedButton(
@@ -272,6 +277,7 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
     required String? value,
     required Function(String?) onChanged,
     required List<DropdownMenuItem<String>> items,
+    bool isEnabled = true,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -281,27 +287,31 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-          ),
-          value: value,
-          isExpanded: true, // Makes the dropdown take full width
-          icon: const Icon(Icons.arrow_drop_down),
-          iconSize: 24,
-          hint: const Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              "اختر",
-              style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500),
+        AbsorbPointer(
+          absorbing: !isEnabled, // disables interaction if false
+          child: DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
             ),
+            value: value,
+            isExpanded: true,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 24,
+            hint: const Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                "اختر",
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+            items: items,
+            onChanged: isEnabled ? onChanged : (_) {},
           ),
-          items: items,
-          onChanged: onChanged,
         ),
       ],
     );

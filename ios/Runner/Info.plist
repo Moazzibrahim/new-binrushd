@@ -16,6 +16,10 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>binrushd_app</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app needs access to your location to show branch locations.</string>
+    <key>io.flutter.embedded_views_preview</key>
+    <true/>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

@@ -2,6 +2,7 @@
 
 import 'package:binrushd_medical_center/controller/Auth/login_provider.dart';
 import 'package:binrushd_medical_center/controller/add_to_favourites_provider.dart';
+import 'package:binrushd_medical_center/view/widgets/show_signup_dialog_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:binrushd_medical_center/constants/constants.dart';
 import 'package:binrushd_medical_center/controller/doctors/fetch_individual_doctor_provider.dart';
@@ -253,13 +254,27 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
+                                  if (token == null || token.isEmpty) {
+                                    showDialog(
+                                      context: context,
                                       builder: (context) =>
-                                          const MakeAppointmentScreen(),
-                                    ),
-                                  );
+                                          const CustomAlertDialog(
+                                        title: 'تنبيه',
+                                        message:
+                                            'يجب التسجيل بحساب لكي تحجز موعد',
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            MakeAppointmentScreen(
+                                          docid: doctor.id,
+                                        ),
+                                      ),
+                                    );
+                                  }
                                 },
                                 child: const Text(
                                   "حجز موعد",

@@ -26,9 +26,9 @@ class ProfileScreens extends StatelessWidget {
 
     // Call the API to fetch profile data when the screen is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (profileProvider.authUserResponse == null) {
+      if (profileProvider.authUserResponse == null && token != null) {
         profileProvider.fetchProfile(
-          token: token!, // Replace with the actual token
+          token: token,
           context: context,
         );
       }
@@ -41,7 +41,7 @@ class ProfileScreens extends StatelessWidget {
           children: [
             const SizedBox(height: 40), // Top padding
             profileProvider.authUserResponse == null
-                ? const CircularProgressIndicator() // Show loading indicator
+                ? const SizedBox() // Show loading indicator
                 : Text(
                     ' ${profileProvider.authUserResponse!.data.fname} ${profileProvider.authUserResponse!.data.lname}',
                     style: const TextStyle(

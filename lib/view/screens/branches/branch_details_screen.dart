@@ -1,6 +1,8 @@
-// ignore_for_file: library_private_types_in_public_api
-
+// ignore_for_file: library_private_types_in_public_api, unused_field
+import 'package:binrushd_medical_center/controller/Auth/login_provider.dart';
 import 'package:binrushd_medical_center/view/screens/appointments/make_appointments_screen.dart';
+import 'package:binrushd_medical_center/view/screens/branches/full_map_screen.dart';
+import 'package:binrushd_medical_center/view/widgets/show_signup_dialog_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:binrushd_medical_center/constants/constants.dart';
 import 'package:binrushd_medical_center/controller/branches/fetch_individual_branch_provider.dart';
@@ -30,6 +32,8 @@ class _BranchDetailsScreenState extends State<BranchDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final logprov = Provider.of<LoginProvider>(context, listen: false);
+    final token = logprov.token;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -153,29 +157,59 @@ class _BranchDetailsScreenState extends State<BranchDetailsScreen> {
                               const SizedBox(
                                 height: 15,
                               ),
-                              Container(
-                                height: 300,
-                                margin: const EdgeInsets.only(top: 16),
-                                child: GoogleMap(
-                                  onMapCreated: (controller) {
-                                    _mapController = controller;
-                                  },
-                                  initialCameraPosition: CameraPosition(
-                                    target: LatLng(
-                                        branch.latitude, branch.longitude),
-                                    zoom: 14,
-                                  ),
-                                  markers: {
-                                    Marker(
-                                      markerId:
-                                          const MarkerId('branch_location'),
-                                      position: LatLng(
-                                          branch.latitude, branch.longitude),
-                                      infoWindow:
-                                          InfoWindow(title: branch.name),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height: 300,
+                                    margin: const EdgeInsets.only(top: 16),
+                                    child: GoogleMap(
+                                      myLocationEnabled: true,
+                                      myLocationButtonEnabled: true,
+                                      onMapCreated: (controller) {
+                                        _mapController = controller;
+                                      },
+                                      initialCameraPosition: CameraPosition(
+                                        target: LatLng(
+                                            branch.latitude, branch.longitude),
+                                        zoom: 14,
+                                      ),
+                                      markers: {
+                                        Marker(
+                                          markerId:
+                                              const MarkerId('branch_location'),
+                                          position: LatLng(branch.latitude,
+                                              branch.longitude),
+                                          infoWindow:
+                                              InfoWindow(title: branch.name),
+                                        ),
+                                      },
                                     ),
-                                  },
-                                ),
+                                  ),
+                                  Center(
+                                    child: TextButton.icon(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                FullScreenMapScreen(
+                                              latitude: branch.latitude,
+                                              longitude: branch.longitude,
+                                              branchName: branch.name,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      icon: const Icon(Icons.fullscreen,
+                                          color: Colors.blue),
+                                      label: const Text(
+                                        'عرض الخريطة بحجم كامل',
+                                        style: TextStyle(color: Colors.blue),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(
                                 height: 15,
@@ -185,11 +219,25 @@ class _BranchDetailsScreenState extends State<BranchDetailsScreen> {
                                   padding: const EdgeInsets.all(10.0),
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      Navigator.push(
+                                      if (token == null || token.isEmpty) {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              const CustomAlertDialog(
+                                            title: 'تنبيه',
+                                            message:
+                                                'يجب التسجيل بحساب لكي تحجز موعد',
+                                          ),
+                                        );
+                                      } else {
+                                        Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const MakeAppointmentScreen()));
+                                            builder: (context) =>
+                                                const MakeAppointmentScreen(),
+                                          ),
+                                        );
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color.fromRGBO(
