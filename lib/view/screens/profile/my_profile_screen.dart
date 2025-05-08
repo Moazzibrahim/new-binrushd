@@ -1,3 +1,4 @@
+import 'package:binrushd_medical_center/view/screens/tabs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:binrushd_medical_center/controller/Auth/login_provider.dart';
 import 'package:binrushd_medical_center/controller/profile_provider.dart';
@@ -8,16 +9,60 @@ class MyProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Fetch the ProfileProvider
     final profileProvider = Provider.of<ProfileProvider>(context);
     final logprov = Provider.of<LoginProvider>(context, listen: false);
-    final token = logprov.token;
 
-    // Call the API to fetch profile data when the screen is built
+    // ✅ Check if token is null BEFORE using it
+    if (logprov.token == null) {
+      return Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: const Text(
+            'حسابي',
+            style: TextStyle(
+                fontFamily: 'Arial', // Change to your preferred Arabic font
+                fontWeight: FontWeight.w700,
+                fontSize: 18),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          elevation: 0,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  logprov.token == null
+                      ? Navigator.pop(context)
+                      : Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const TabsScreen()));
+                },
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.black,
+                )),
+          ],
+        ),
+        body: const Center(
+          child: Text(
+            "يجب التسجيل لتري حسابك",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+      );
+    }
+
+    final token = logprov.token!;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (profileProvider.authUserResponse == null) {
         profileProvider.fetchProfile(
-          token: token!, // Replace with the actual token
+          token: token,
           context: context,
         );
       }
@@ -46,17 +91,13 @@ class MyProfileScreen extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 20),
-                            // Build text fields with fetched data
-                            if (profileProvider.authUserResponse != null) ...[
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: profileProvider.authUserResponse != null
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 20),
                               buildTextField(
                                 label: 'الاسم بالكامل',
                                 hint:
@@ -77,14 +118,9 @@ class MyProfileScreen extends StatelessWidget {
                                     .authUserResponse!.data.mobile,
                                 icon: Icons.phone,
                               ),
-                            ] else
-                              const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
+                            ],
+                          )
+                        : const Center(child: CircularProgressIndicator()),
                   ),
                 ),
               ),
