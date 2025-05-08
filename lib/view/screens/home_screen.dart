@@ -5,7 +5,6 @@ import 'package:binrushd_medical_center/view/screens/branches/branch_details_scr
 import 'package:binrushd_medical_center/view/screens/doctors/doctor_details_screen.dart';
 import 'package:binrushd_medical_center/view/screens/specializies/specializies_details_screen.dart';
 import 'package:binrushd_medical_center/view/widgets/filter_button_widget.dart';
-import 'package:binrushd_medical_center/view/widgets/show_signup_dialog_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:binrushd_medical_center/constants/constants.dart';
@@ -33,44 +32,51 @@ class _HomePageState extends State<HomePage> {
   bool isDoctorsSelected = true;
   int selectionindex = 0;
   int _currentIndex = 0;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      Provider.of<FetchDoctorsDataProvider>(context, listen: false)
-          .fetchDoctorsData(context);
-      Provider.of<FetchBranchesProvider>(context, listen: false)
-          .fetchBranches(context);
-      Provider.of<FetchDepartmentsProvider>(context, listen: false)
-          .fetchDepartments(context);
-      Provider.of<FetchPostsProvider>(context, listen: false)
-          .fetchPosts(context);
-      Provider.of<FetchOffersProvider>(context, listen: false)
-          .fetchOffers(context);
-      Provider.of<LoginProvider>(context, listen: false);
+
+    // Run after the first build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeData();
     });
+  }
+
+  void _initializeData() {
+    final contextRead = context;
+
+    // Fetch static data
+    Provider.of<FetchDoctorsDataProvider>(contextRead, listen: false)
+        .fetchDoctorsData(contextRead);
+    Provider.of<FetchBranchesProvider>(contextRead, listen: false)
+        .fetchBranches(contextRead);
+    Provider.of<FetchDepartmentsProvider>(contextRead, listen: false)
+        .fetchDepartments(contextRead);
+    Provider.of<FetchPostsProvider>(contextRead, listen: false)
+        .fetchPosts(contextRead);
+    Provider.of<FetchOffersProvider>(contextRead, listen: false)
+        .fetchOffers(contextRead);
+
+    // Fetch profile if token exists
+    final loginProvider =
+        Provider.of<LoginProvider>(contextRead, listen: false);
+    final profileProvider =
+        Provider.of<ProfileProvider>(contextRead, listen: false);
+
+    final token = loginProvider.token;
+    if (!_isInitialized && token != null && token.isNotEmpty) {
+      _isInitialized = true;
+      profileProvider.fetchProfile(token: token, context: contextRead);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final profileProvider = Provider.of<ProfileProvider>(context);
-    final logprov = Provider.of<LoginProvider>(context, listen: false);
-    final token = logprov.token;
-
-    // Call the API to fetch profile data when the screen is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (token != null && token.isNotEmpty) {
-        // ✅ Check if token is not null
-        if (profileProvider.authUserResponse == null) {
-          profileProvider.fetchProfile(
-            token: token,
-            context: context,
-          );
-        }
-      }
-    });
-
+    final contextRead = context;
+    final profileProvider =
+        Provider.of<ProfileProvider>(contextRead, listen: false);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -95,22 +101,12 @@ class _HomePageState extends State<HomePage> {
                       EdgeInsets.symmetric(vertical: 5.h, horizontal: 18.w),
                 ),
                 onPressed: () {
-                  if (token == null || token.isEmpty) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => const CustomAlertDialog(
-                        title: 'تنبيه',
-                        message: 'يجب التسجيل بحساب لكي تحجز موعد',
-                      ),
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MakeAppointmentScreen(),
-                      ),
-                    );
-                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MakeAppointmentScreen(),
+                    ),
+                  );
                 },
                 child: Text(
                   'حجز موعد',
@@ -612,28 +608,15 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                           onPressed: () {
-                                            if (token == null ||
-                                                token.isEmpty) {
-                                              showDialog(
-                                                context: context,
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
                                                 builder: (context) =>
-                                                    const CustomAlertDialog(
-                                                  title: 'تنبيه',
-                                                  message:
-                                                      'يجب التسجيل بحساب لكي تحجز موعد',
+                                                    MakeAppointmentScreen(
+                                                  docid: doctor.id,
                                                 ),
-                                              );
-                                            } else {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      MakeAppointmentScreen(
-                                                    docid: doctor.id,
-                                                  ),
-                                                ),
-                                              );
-                                            }
+                                              ),
+                                            );
                                           },
                                           child: const Text(
                                             'حجز موعد',
@@ -788,26 +771,13 @@ class _HomePageState extends State<HomePage> {
                                               minimumSize: const Size(100, 40),
                                             ),
                                             onPressed: () {
-                                              if (token == null ||
-                                                  token.isEmpty) {
-                                                showDialog(
-                                                  context: context,
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
                                                   builder: (context) =>
-                                                      const CustomAlertDialog(
-                                                    title: 'تنبيه',
-                                                    message:
-                                                        'يجب التسجيل بحساب لكي تحجز موعد',
-                                                  ),
-                                                );
-                                              } else {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const MakeAppointmentScreen(),
-                                                  ),
-                                                );
-                                              }
+                                                      const MakeAppointmentScreen(),
+                                                ),
+                                              );
                                             },
                                             child: const Text(
                                               'حجز موعد',

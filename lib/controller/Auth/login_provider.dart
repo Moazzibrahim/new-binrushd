@@ -61,5 +61,11 @@ class LoginProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-}
 
+  // ✅ Add this method to clear token and notify listeners
+  void clearToken() {
+    token = null;
+    _loginResponse = null;
+    notifyListeners();
+  }
+}

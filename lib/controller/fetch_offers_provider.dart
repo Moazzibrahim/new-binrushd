@@ -38,23 +38,23 @@ class FetchOffersProvider with ChangeNotifier {
       } else if (response.statusCode == 401) {
         // Handle unauthorized access (token expired or invalid)
         log('Unauthorized access. Please log in again.');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Unauthorized access. Please log in again.')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(
+        //       content: Text('Unauthorized access. Please log in again.')),
+        // );
       } else {
         log('Failed to fetch offers. Status code: ${response.statusCode}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${response.reasonPhrase}')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Error: ${response.reasonPhrase}')),
+        // );
         throw Exception(
             'Failed to fetch offers. Status code: ${response.statusCode}');
       }
     } catch (error) {
       log('Error occurred: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $error')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('An error occurred: $error')),
+      // );
       throw Exception('Error occurred: $error');
     } finally {
       _isFetching = false; // Reset fetching flag

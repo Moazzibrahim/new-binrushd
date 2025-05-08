@@ -31,6 +31,7 @@ class _TabsScreenState extends State<TabsScreen> {
             // Expanded section for the main content
             Expanded(
               child: PageView(
+                physics: const NeverScrollableScrollPhysics(),
                 controller: _pageController,
                 onPageChanged: (index) {
                   setState(() {

@@ -15,16 +15,22 @@ import 'package:binrushd_medical_center/view/screens/my_favourites_screen.dart';
 import 'package:binrushd_medical_center/view/screens/profile/my_profile_screen.dart';
 import 'package:provider/provider.dart';
 
-class ProfileScreens extends StatelessWidget {
+class ProfileScreens extends StatefulWidget {
   const ProfileScreens({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final profileProvider = Provider.of<ProfileProvider>(context);
+  State<ProfileScreens> createState() => _ProfileScreensState();
+}
+
+class _ProfileScreensState extends State<ProfileScreens> {
+  @override
+  void initState() {
+    super.initState();
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
     final logprov = Provider.of<LoginProvider>(context, listen: false);
     final token = logprov.token;
 
-    // Call the API to fetch profile data when the screen is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (profileProvider.authUserResponse == null && token != null) {
         profileProvider.fetchProfile(
@@ -33,6 +39,11 @@ class ProfileScreens extends StatelessWidget {
         );
       }
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final profileProvider = Provider.of<ProfileProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -165,104 +176,123 @@ class ProfileScreens extends StatelessWidget {
 
   Widget buildLogoutButton(BuildContext context) {
     final loginProvider = Provider.of<LoginProvider>(context, listen: false);
+    final token = loginProvider.token;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 9.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end, // Adjusts alignment
         children: [
-          Text(
-            'تسجيل الخروج',
-            style: TextStyle(
-              color: backgroundColor,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          token != null
+              ? Text(
+                  'تسجيل الخروج',
+                  style: TextStyle(
+                    color: backgroundColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                )
+              : Text(
+                  "تسجيل الدخول او انشاء حساب",
+                  style: TextStyle(
+                    color: backgroundColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
           InkWell(
             onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text(
-                      'تسجيل الخروج',
-                      textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                    ),
-                    content: const Text(
-                      'هل انت متأكد انك تريد تسجيل الخروج من حسابك؟',
-                      style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400),
-                      textAlign: TextAlign.center,
-                    ),
-                    actions: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: OutlinedButton(
-                              onPressed: () {
-                                Provider.of<LogoutProvider>(context,
-                                        listen: false)
-                                    .logOut(
-                                  token: loginProvider.token!,
-                                  context: context,
-                                );
-                                Navigator.of(context).pop(); // Close the dialog
-                              },
-                              style: OutlinedButton.styleFrom(
-                                backgroundColor: backgroundColor,
-                                side: const BorderSide(color: Colors.grey),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 9), // Adjust padding
-                              ),
-                              child: const Text(
-                                'نعم، الخروج',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                                maxLines: 1, // Ensure single-line text
-                                overflow: TextOverflow
-                                    .ellipsis, // Prevent text overflow
-                              ),
-                            ),
+              token != null
+                  ? showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text(
+                            'تسجيل الخروج',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 18),
                           ),
-                          const SizedBox(width: 10),
-                          Flexible(
-                            child: OutlinedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(); // Close the dialog
-                              },
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.grey),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text(
-                                'لا، الغاء',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                    fontSize: 16),
-                              ),
-                            ),
+                          content: const Text(
+                            'هل انت متأكد انك تريد تسجيل الخروج من حسابك؟',
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400),
+                            textAlign: TextAlign.center,
                           ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
-              );
+                          actions: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      Provider.of<LogoutProvider>(context,
+                                              listen: false)
+                                          .logOut(
+                                        token: loginProvider.token!,
+                                        context: context,
+                                      );
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor: backgroundColor,
+                                      side:
+                                          const BorderSide(color: Colors.grey),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 9), // Adjust padding
+                                    ),
+                                    child: const Text(
+                                      'نعم، الخروج',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                      maxLines: 1, // Ensure single-line text
+                                      overflow: TextOverflow
+                                          .ellipsis, // Prevent text overflow
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Flexible(
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      side:
+                                          const BorderSide(color: Colors.grey),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'لا، الغاء',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black,
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    )
+                  : Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginScreen()));
             },
             child: CircleAvatar(
               backgroundColor: Colors.white,
@@ -323,6 +353,7 @@ class ProfileScreens extends StatelessWidget {
                                 Future.delayed(
                                   const Duration(seconds: 2),
                                   () {
+                                    setState(() {}); // Trigger UI refresh
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
