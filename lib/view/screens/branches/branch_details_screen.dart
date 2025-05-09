@@ -276,7 +276,10 @@ class _BranchDetailsScreenState extends State<BranchDetailsScreen> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                const MakeAppointmentScreen(),
+                                                MakeAppointmentScreen(
+                                              branchId: branch.id,
+                                              branchName: branch.name,
+                                            ),
                                           ),
                                         );
                                       }

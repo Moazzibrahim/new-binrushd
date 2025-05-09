@@ -271,6 +271,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                         builder: (context) =>
                                             MakeAppointmentScreen(
                                           docid: doctor.id,
+                                          doctorName: doctor.fname,
                                         ),
                                       ),
                                     );

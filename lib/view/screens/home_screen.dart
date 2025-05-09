@@ -614,6 +614,7 @@ class _HomePageState extends State<HomePage> {
                                                 builder: (context) =>
                                                     MakeAppointmentScreen(
                                                   docid: doctor.id,
+                                                  doctorName: doctor.fname,
                                                 ),
                                               ),
                                             );
@@ -775,7 +776,10 @@ class _HomePageState extends State<HomePage> {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      const MakeAppointmentScreen(),
+                                                      MakeAppointmentScreen(
+                                                    branchId: branch.id,
+                                                    branchName: branch.name,
+                                                  ),
                                                 ),
                                               );
                                             },

@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, unused_field, avoid_print, unused_local_variable
 
+import 'package:binrushd_medical_center/view/screens/Auth/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:binrushd_medical_center/constants/constants.dart';
 import 'package:binrushd_medical_center/controller/Auth/login_provider.dart';
@@ -10,7 +11,11 @@ import 'package:binrushd_medical_center/controller/make_reservation_provider.dar
 
 class MakeAppointmentScreen extends StatefulWidget {
   final int? docid;
-  const MakeAppointmentScreen({this.docid, super.key});
+  final int? branchId;
+  final String? doctorName;
+  final String? branchName;
+  const MakeAppointmentScreen(
+      {this.docid, this.branchId, this.doctorName, this.branchName, super.key});
 
   @override
   _MakeAppointmentScreenState createState() => _MakeAppointmentScreenState();
@@ -23,6 +28,8 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
   String? _selectedSurvey; // Default value
   String? _selectedBranchId; // Store branch ID here
   String? __selectedDoctorId;
+  List<dynamic> filteredBranches = [];
+  List<dynamic> filteredDoctors = [];
 
   @override
   void initState() {
@@ -30,10 +37,29 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
     if (widget.docid != null) {
       __selectedDoctorId = widget.docid.toString();
     }
+    if (widget.branchId != null) {
+      _selectedBranchId = widget.branchId.toString();
+    }
+
     Provider.of<FetchBranchesProvider>(context, listen: false)
-        .fetchBranches(context);
+        .fetchBranches(context)
+        .then((_) {
+      if (widget.branchId != null) {
+        setState(() {
+          _selectedBranchId = widget.branchId.toString();
+        });
+      }
+    });
+
     Provider.of<FetchDoctorsDataProvider>(context, listen: false)
-        .fetchDoctorsData(context);
+        .fetchDoctorsData(context)
+        .then((_) {
+      if (widget.docid != null) {
+        setState(() {
+          __selectedDoctorId = widget.docid.toString();
+        });
+      }
+    });
   }
 
   @override
@@ -98,7 +124,9 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
                 },
                 items: const [
                   DropdownMenuItem(value: "internet", child: Text("الانترنت")),
-                  DropdownMenuItem(value: "sms", child: Text("رسايل")),
+                  DropdownMenuItem(value: "sms", child: Text("رسايل الجوال")),
+                  DropdownMenuItem(
+                      value: "friends", child: Text(" الاهل والاصدقاء")),
                 ],
               ),
               const SizedBox(height: 16),
@@ -118,7 +146,7 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 16),
-              if (widget.docid == null)
+              if (doctors.isNotEmpty)
                 _buildDropdown(
                   label: "اختار الطبيب",
                   value: __selectedDoctorId,
@@ -202,10 +230,26 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
         Provider.of<MakeReservationProvider>(context, listen: false);
     final loginProvider = Provider.of<LoginProvider>(context, listen: false);
     if (loginProvider.token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(' يرجي التسجيل بحساب شخصي لكي تحجز معاد '),
-        ),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("تنبيه"),
+            content: const Text('يرجي التسجيل بحساب شخصي لكي تحجز معاد'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("حسناً"),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const LoginScreen())); // Close the dialog
+                },
+              ),
+            ],
+          );
+        },
       );
     }
 

@@ -47,8 +47,23 @@ class MakeReservationProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         print('Request successful: ${response.body}');
         // Handle the response if needed
-        ScaffoldMessenger.of(context!).showSnackBar(const SnackBar(
-            content: Text(" تم الحجز بنجاح تفقد حسابك للتأكيد ")));
+        showDialog(
+          context: context!,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("نجاح"),
+              content: const Text("تم الحجز بنجاح، تفقد حسابك للتأكيد."),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("حسناً"),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                ),
+              ],
+            );
+          },
+        );
       } else {
         print('Request failed: ${response.statusCode}');
         ScaffoldMessenger.of(context!).showSnackBar(
