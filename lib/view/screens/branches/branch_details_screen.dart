@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, unused_field
+// ignore_for_file: library_private_types_in_public_api, unused_field, use_build_context_synchronously
 import 'package:binrushd_medical_center/controller/Auth/login_provider.dart';
 import 'package:binrushd_medical_center/view/screens/appointments/make_appointments_screen.dart';
 import 'package:binrushd_medical_center/view/screens/branches/full_map_screen.dart';
@@ -8,6 +8,7 @@ import 'package:binrushd_medical_center/constants/constants.dart';
 import 'package:binrushd_medical_center/controller/branches/fetch_individual_branch_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BranchDetailsScreen extends StatefulWidget {
   final int? branchId;
@@ -206,6 +207,47 @@ class _BranchDetailsScreenState extends State<BranchDetailsScreen> {
                                       label: const Text(
                                         'عرض الخريطة بحجم كامل',
                                         style: TextStyle(color: Colors.blue),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Center(
+                                    child: ElevatedButton.icon(
+                                      onPressed: () async {
+                                        final Uri googleMapsUrl = Uri.parse(
+                                            'https://www.google.com/maps/dir/?api=1&destination=${branch.latitude},${branch.longitude}&travelmode=driving');
+
+                                        if (await canLaunchUrl(googleMapsUrl)) {
+                                          await launchUrl(googleMapsUrl,
+                                              mode: LaunchMode
+                                                  .externalApplication);
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                                content: Text(
+                                                    'تعذر فتح تطبيق الخرائط')),
+                                          );
+                                        }
+                                      },
+                                      icon: const Icon(Icons.navigation),
+                                      label: const Text(
+                                        "التوجه للفرع",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color.fromRGBO(149, 0, 0, 1),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 30, vertical: 12),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
                                       ),
                                     ),
                                   ),

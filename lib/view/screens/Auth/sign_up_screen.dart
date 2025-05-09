@@ -71,7 +71,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: [
                 buildLabeledTextField(
                   'الاسم الاول',
-                  'محمد',
+                  'الاسم الاول',
                   "",
                   suffixIcon: const Icon(
                     Icons.person,
@@ -88,7 +88,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 15),
                 buildLabeledTextField(
                   'الاسم التاني',
-                  'ابراهيم',
+                  'الاسم التاني',
                   "",
                   suffixIcon: const Icon(
                     Icons.person,
@@ -139,7 +139,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 15),
                 buildPasswordField(
                   'كلمة السر',
-                  '●●●●●●●',
+                  //'●●●●●●●',
+                  "",
                   Icons.visibility,
                   controller: passwordController,
                   validator: (value) {
@@ -155,7 +156,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 15),
                 buildPasswordField(
                   'تاكيد كلمة السر',
-                  '●●●●●●●',
+                  // '●●●●●●●',
+                  "",
                   Icons.visibility,
                   controller: confirmPasswordController,
                   validator: (value) {
