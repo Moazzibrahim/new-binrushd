@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:binrushd_medical_center/model/branches_model.dart';
 
@@ -25,6 +26,13 @@ class FetchBranchesProvider with ChangeNotifier {
         final jsonResponse = json.decode(response.body);
         _branchResponse =
             BranchResponse.fromJson(jsonResponse); // Assigning to the response
+
+        Box<Branch> branchBox = Hive.box<Branch>('branches');
+        branchBox.clear(); // Optional: clear old data
+        for (var branch in jsonResponse['data']) {
+          final branchModel = Branch.fromJson(branch); // Convert Map to Branch
+          branchBox.put(branchModel.id, branchModel); // Save Branch object
+        }
         notifyListeners(); // Notify listeners about the change in data
       } else if (response.statusCode == 401) {
         // Handle unauthorized access (token expired or invalid)
@@ -37,6 +45,17 @@ class FetchBranchesProvider with ChangeNotifier {
     } catch (error) {
       log('Error occurred: $error');
       throw Exception('Error: $error');
+    }
+  }
+
+  Future<void> loadCachedBranches() async {
+    final branchBox = Hive.box<Branch>('branches');
+    final cachedBranches = branchBox.values.toList();
+
+    if (cachedBranches.isNotEmpty) {
+      _branchResponse = BranchResponse(
+          data: cachedBranches, message: 'Cached branches loaded');
+      notifyListeners();
     }
   }
 }

@@ -12,6 +12,20 @@ class AllBranchesScreen extends StatefulWidget {
 }
 
 class _AllBranchesScreenState extends State<AllBranchesScreen> {
+  bool _isInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      final fetchProvider =
+          Provider.of<FetchBranchesProvider>(context, listen: false);
+      fetchProvider.loadCachedBranches();
+      fetchProvider.fetchBranches(context);
+      _isInitialized = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Fetch the branches data using the provider

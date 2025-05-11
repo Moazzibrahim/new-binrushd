@@ -50,8 +50,10 @@ class _HomePageState extends State<HomePage> {
     // Fetch static data
     Provider.of<FetchDoctorsDataProvider>(contextRead, listen: false)
         .fetchDoctorsData(contextRead);
-    Provider.of<FetchBranchesProvider>(contextRead, listen: false)
-        .fetchBranches(contextRead);
+    final fetchProvider =
+        Provider.of<FetchBranchesProvider>(context, listen: false);
+    fetchProvider.loadCachedBranches(); // Load from Hive
+    fetchProvider.fetchBranches(context);
     Provider.of<FetchDepartmentsProvider>(contextRead, listen: false)
         .fetchDepartments(contextRead);
     Provider.of<FetchPostsProvider>(contextRead, listen: false)

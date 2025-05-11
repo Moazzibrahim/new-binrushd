@@ -21,6 +21,8 @@ import 'package:binrushd_medical_center/controller/make_reservation_provider.dar
 import 'package:binrushd_medical_center/controller/profile_provider.dart';
 import 'package:binrushd_medical_center/view/screens/onboarding/splash_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:binrushd_medical_center/model/branches_model.dart'; // Ensure this is the correct path to the file defining BranchResponseAdapter
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,6 +30,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token');
+
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(BranchResponseAdapter());
+  Hive.registerAdapter(BranchAdapter());
+  Hive.registerAdapter(WorkTimesAdapter());
+  await Hive.openBox<Branch>('branches');
 
   runApp(MyApp(isLoggedIn: token != null));
 }
