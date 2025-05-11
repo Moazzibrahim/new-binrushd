@@ -22,13 +22,19 @@ import 'package:binrushd_medical_center/controller/profile_provider.dart';
 import 'package:binrushd_medical_center/view/screens/onboarding/splash_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
+  runApp(MyApp(isLoggedIn: token != null));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  const MyApp({super.key, required this.isLoggedIn});
 
   // This widget is the root of your application.
   @override
@@ -67,7 +73,9 @@ class MyApp extends StatelessWidget {
               fontFamily: 'IBM Plex Sans Arabic', // Set your global font family
               // You can also customize other theme properties here if needed
             ),
-            home: const SplashScreen(),
+            home: SplashScreen(
+              isLoggedIn: isLoggedIn,
+            ),
           );
         },
       ),

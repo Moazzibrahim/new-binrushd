@@ -5,6 +5,7 @@ import 'package:binrushd_medical_center/model/auth/login_model.dart';
 import 'package:binrushd_medical_center/view/screens/tabs_screen.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginProvider with ChangeNotifier {
   LoginResponse? _loginResponse;
@@ -43,8 +44,9 @@ class LoginProvider with ChangeNotifier {
             MaterialPageRoute(builder: (context) => const TabsScreen()));
         final responseBody = json.decode(response.body);
         token = responseBody['data']['user']['token'];
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token!);
         log(token!);
-        print(responseBody);
         _loginResponse = LoginResponse.fromJson(responseBody);
         notifyListeners();
       } else {
@@ -61,6 +63,19 @@ class LoginProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> loadToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  final storedToken = prefs.getString('token');
+  if (storedToken != null) {
+    token = storedToken;
+    notifyListeners();
+    log('Token loaded: $token');
+  } else {
+    log('No token found in SharedPreferences');
+  }
+}
+
 
   // ✅ Add this method to clear token and notify listeners
   void clearToken() {

@@ -1,11 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:binrushd_medical_center/controller/Auth/login_provider.dart';
+import 'package:binrushd_medical_center/view/screens/tabs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:binrushd_medical_center/constants/constants.dart';
 import 'package:binrushd_medical_center/view/screens/onboarding/first_onboarding.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final bool isLoggedIn;
+  const SplashScreen({super.key, required this.isLoggedIn});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -16,13 +20,21 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
+    // ✅ تحميل التوكن داخل LoginProvider
+    Future.delayed(Duration.zero, () {
+      final loginProvider = Provider.of<LoginProvider>(context, listen: false);
+      loginProvider.loadToken();
+    });
+
     // Navigate to the next screen after 2 seconds
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                const OnboardingScreen()), // Replace with your screen
+          builder: (context) => widget.isLoggedIn
+              ? const TabsScreen() // ✅ لو مسجل دخول يروح Tabs
+              : const OnboardingScreen(),
+        ),
       );
     });
   }

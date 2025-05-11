@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:binrushd_medical_center/view/screens/Auth/login_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LogoutProvider with ChangeNotifier {
   Future<void> logOut({
@@ -34,7 +35,8 @@ class LogoutProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         // Parse the response if needed
         print('Request successful: ${response.body}');
-
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('token');
         final loginProvider =
             Provider.of<LoginProvider>(context, listen: false);
         loginProvider.clearToken();
