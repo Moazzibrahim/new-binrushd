@@ -15,7 +15,8 @@ class BranchResponse extends HiveObject {
   factory BranchResponse.fromJson(Map<String, dynamic> json) {
     return BranchResponse(
       message: json['message'],
-      data: (json['data'] as List).map((item) => Branch.fromJson(item)).toList(),
+      data:
+          (json['data'] as List).map((item) => Branch.fromJson(item)).toList(),
     );
   }
 }
@@ -49,6 +50,9 @@ class Branch extends HiveObject {
   @HiveField(8)
   final String image;
 
+  @HiveField(9)
+  final List<Doctor> doctors;
+
   Branch({
     required this.id,
     required this.name,
@@ -59,6 +63,7 @@ class Branch extends HiveObject {
     required this.worktimes,
     required this.email,
     required this.image,
+    required this.doctors,
   });
 
   factory Branch.fromJson(Map<String, dynamic> json) {
@@ -67,11 +72,14 @@ class Branch extends HiveObject {
       name: json['name'],
       brief: json['brief'],
       address: json['address'],
-      latitude: json['latitude'],
-      longitude: json['longitude'],
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
       worktimes: WorkTimes.fromJson(json['worktimes']),
       email: json['email'],
       image: json['image'],
+      doctors: (json['doctors'] as List)
+          .map((item) => Doctor.fromJson(item))
+          .toList(),
     );
   }
 }
@@ -118,6 +126,77 @@ class WorkTimes extends HiveObject {
       thursday: json['thursday'],
       friday: json['friday'],
       saturday: json['saturday'],
+    );
+  }
+}
+
+@HiveType(typeId: 3)
+class Doctor extends HiveObject {
+  @HiveField(0)
+  final int id;
+
+  @HiveField(1)
+  final String? name;
+
+  @HiveField(2)
+  final String gender;
+
+  @HiveField(3)
+  final List<String> qualifications;
+
+  @HiveField(4)
+  final List<String> experience;
+
+  @HiveField(5)
+  final String speciality;
+
+  @HiveField(6)
+  final String degree;
+
+  @HiveField(7)
+  final String? phone;
+
+  @HiveField(8)
+  final String? email;
+
+  @HiveField(9)
+  final String brief;
+
+  @HiveField(10)
+  final String image;
+
+  @HiveField(11)
+  final int highlighted;
+
+  Doctor({
+    required this.id,
+    this.name,
+    required this.gender,
+    required this.qualifications,
+    required this.experience,
+    required this.speciality,
+    required this.degree,
+    this.phone,
+    this.email,
+    required this.brief,
+    required this.image,
+    required this.highlighted,
+  });
+
+  factory Doctor.fromJson(Map<String, dynamic> json) {
+    return Doctor(
+      id: json['id'],
+      name: json['name'] ?? "",
+      gender: json['Gender'] ?? '',
+      qualifications: List<String>.from(json['qualifications'] ?? []),
+      experience: List<String>.from(json['experience'] ?? []),
+      speciality: json['Speciality'] ?? '',
+      degree: json['Degree'] ?? '',
+      phone: json['phone'],
+      email: json['email'],
+      brief: json['brief'] ?? '',
+      image: json['image'] ?? '',
+      highlighted: json['highligthed'] ?? 0,
     );
   }
 }

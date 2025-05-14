@@ -109,14 +109,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   "assets/images/midd.png",
                   controller: emailController,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'الإيميل مطلوب';
-                    }
-                    final emailRegex = RegExp(
-                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-                    if (!emailRegex.hasMatch(value)) {
-                      return 'يرجى إدخال إيميل صحيح';
-                    }
+                    // if (value == null || value.isEmpty) {
+                    //   return 'الإيميل مطلوب';
+                    // }
+                    // final emailRegex = RegExp(
+                    //     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                    // if (!emailRegex.hasMatch(value!)) {
+                    //   return 'يرجى إدخال إيميل صحيح';
+                    // }
                     return null;
                   },
                 ),

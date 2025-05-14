@@ -154,7 +154,6 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image Banner
               Consumer<FetchOffersProvider>(
                 builder: (context, provider, child) {
                   if (provider.offersResponse == null) {
@@ -162,21 +161,25 @@ class _HomePageState extends State<HomePage> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final posts = provider.offersResponse!.data;
+                  // Combine both offers and campaigns
+                  final allImages = [
+                    ...provider.offersResponse!.data.offers.map((e) => e.image),
+                    ...provider.offersResponse!.data.campaigns
+                        .map((e) => e.image),
+                  ];
+
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       CarouselSlider(
                         options: CarouselOptions(
                           height: 170.0,
-                          enlargeCenterPage:
-                              false, // Disable enlarging the center page
+                          enlargeCenterPage: false,
                           autoPlay: true,
-                          viewportFraction:
-                              1.0, // Each image takes the full width
-                          autoPlayInterval: const Duration(seconds: 3),
+                          viewportFraction: 1.0,
+                          autoPlayInterval: const Duration(seconds: 7),
                           autoPlayAnimationDuration:
-                              const Duration(milliseconds: 800),
+                              const Duration(milliseconds: 1000),
                           autoPlayCurve: Curves.fastOutSlowIn,
                           pauseAutoPlayOnTouch: true,
                           scrollDirection: Axis.horizontal,
@@ -186,13 +189,13 @@ class _HomePageState extends State<HomePage> {
                             });
                           },
                         ),
-                        items: posts
+                        items: allImages
                             .map(
-                              (item) => Container(
+                              (imageUrl) => Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   image: DecorationImage(
-                                    image: NetworkImage(item.image!),
+                                    image: NetworkImage(imageUrl),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -203,7 +206,7 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: posts.asMap().entries.map((entry) {
+                        children: allImages.asMap().entries.map((entry) {
                           return GestureDetector(
                             onTap: () => setState(() {
                               _currentIndex = entry.key;
@@ -230,7 +233,6 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-
               const SizedBox(
                 height: 10,
               ),
@@ -805,7 +807,6 @@ class _HomePageState extends State<HomePage> {
                         },
                       ),
                     ),
-
               const SizedBox(
                 height: 20,
               ),

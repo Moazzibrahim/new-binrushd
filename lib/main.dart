@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:binrushd_medical_center/controller/delete_account_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:binrushd_medical_center/controller/Auth/check_forget_pass_provider.dart';
@@ -36,7 +38,12 @@ void main() async {
   Hive.registerAdapter(BranchResponseAdapter());
   Hive.registerAdapter(BranchAdapter());
   Hive.registerAdapter(WorkTimesAdapter());
-  await Hive.openBox<Branch>('branches');
+  Hive.registerAdapter(DoctorAdapter());
+  try {
+    await Hive.openBox<Branch>('branches');
+  } catch (e) {
+    log('Error opening Hive box: $e');
+  }
 
   runApp(MyApp(isLoggedIn: token != null));
 }
@@ -69,7 +76,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ResetPasswordProvider()),
         ChangeNotifierProvider(create: (_) => ForgetPasswordProvider()),
         ChangeNotifierProvider(create: (_) => CheckForgetPassProvider()),
-        ChangeNotifierProvider(create: (_) => MakeReportProvider()),
         ChangeNotifierProvider(create: (_) => DeleteAccountProvider()),
       ],
       child: ScreenUtilInit(

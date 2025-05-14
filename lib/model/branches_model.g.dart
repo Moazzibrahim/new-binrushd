@@ -63,13 +63,14 @@ class BranchAdapter extends TypeAdapter<Branch> {
       worktimes: fields[6] as WorkTimes,
       email: fields[7] as String,
       image: fields[8] as String,
+      doctors: (fields[9] as List).cast<Doctor>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Branch obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -87,7 +88,9 @@ class BranchAdapter extends TypeAdapter<Branch> {
       ..writeByte(7)
       ..write(obj.email)
       ..writeByte(8)
-      ..write(obj.image);
+      ..write(obj.image)
+      ..writeByte(9)
+      ..write(obj.doctors);
   }
 
   @override
@@ -149,6 +152,73 @@ class WorkTimesAdapter extends TypeAdapter<WorkTimes> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is WorkTimesAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class DoctorAdapter extends TypeAdapter<Doctor> {
+  @override
+  final int typeId = 3;
+
+  @override
+  Doctor read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Doctor(
+      id: fields[0] as int,
+      name: fields[1] as String?,
+      gender: fields[2] as String,
+      qualifications: (fields[3] as List).cast<String>(),
+      experience: (fields[4] as List).cast<String>(),
+      speciality: fields[5] as String,
+      degree: fields[6] as String,
+      phone: fields[7] as String?,
+      email: fields[8] as String?,
+      brief: fields[9] as String,
+      image: fields[10] as String,
+      highlighted: fields[11] as int,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Doctor obj) {
+    writer
+      ..writeByte(12)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.gender)
+      ..writeByte(3)
+      ..write(obj.qualifications)
+      ..writeByte(4)
+      ..write(obj.experience)
+      ..writeByte(5)
+      ..write(obj.speciality)
+      ..writeByte(6)
+      ..write(obj.degree)
+      ..writeByte(7)
+      ..write(obj.phone)
+      ..writeByte(8)
+      ..write(obj.email)
+      ..writeByte(9)
+      ..write(obj.brief)
+      ..writeByte(10)
+      ..write(obj.image)
+      ..writeByte(11)
+      ..write(obj.highlighted);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DoctorAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

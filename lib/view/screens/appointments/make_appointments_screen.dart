@@ -1,5 +1,7 @@
-// ignore_for_file: library_private_types_in_public_api, unused_field, avoid_print, unused_local_variable
+// ignore_for_file: library_private_types_in_public_api
+import 'dart:developer';
 
+import 'package:binrushd_medical_center/model/doctors_model.dart';
 import 'package:binrushd_medical_center/view/screens/Auth/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:binrushd_medical_center/constants/constants.dart';
@@ -25,8 +27,8 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  String? _selectedSurvey; // Default value
-  String? _selectedBranchId; // Store branch ID here
+  String? _selectedSurvey;
+  String? _selectedBranchId;
   String? __selectedDoctorId;
   List<dynamic> filteredBranches = [];
   List<dynamic> filteredDoctors = [];
@@ -34,40 +36,109 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Initialize selected IDs from widget if they exist
     if (widget.docid != null) {
       __selectedDoctorId = widget.docid.toString();
     }
     if (widget.branchId != null) {
       _selectedBranchId = widget.branchId.toString();
     }
-
+    log("docid: ${widget.docid}");
+    log("branchId: ${widget.branchId}");
+    // Fetch branches and then filter doctors if branch is preselected
     Provider.of<FetchBranchesProvider>(context, listen: false)
         .fetchBranches(context)
         .then((_) {
-      if (widget.branchId != null) {
-        setState(() {
-          _selectedBranchId = widget.branchId.toString();
-        });
+      if (mounted && widget.branchId != null) {
+        _filterDoctorsByBranch(widget.branchId.toString());
       }
     });
 
+    // Fetch doctors and then filter branches if doctor is preselected
     Provider.of<FetchDoctorsDataProvider>(context, listen: false)
         .fetchDoctorsData(context)
         .then((_) {
-      if (widget.docid != null) {
-        setState(() {
-          __selectedDoctorId = widget.docid.toString();
-        });
+      if (mounted && widget.docid != null) {
+        _filterBranchesByDoctor(widget.docid.toString());
       }
     });
+  }
+
+  void _filterDoctorsByBranch(String branchId) {
+    final branchesProvider =
+        Provider.of<FetchBranchesProvider>(context, listen: false);
+    final branches = branchesProvider.branchResponse?.data ?? [];
+
+    setState(() {
+      _selectedBranchId = branchId;
+      filteredDoctors = [];
+
+      // Find the selected branch and get its doctors
+      for (var branch in branches) {
+        if (branch.id.toString() == branchId) {
+          filteredDoctors = branch.doctors;
+          break;
+        }
+      }
+    });
+  }
+
+  void _filterBranchesByDoctor(String doctorId) {
+    final doctorsProvider =
+        Provider.of<FetchDoctorsDataProvider>(context, listen: false);
+    final doctors = doctorsProvider.doctorsResponse?.data ?? [];
+
+    setState(() {
+      __selectedDoctorId = doctorId;
+      filteredBranches = [];
+
+      // Find the selected doctor and get its branches
+      for (var doctor in doctors) {
+        if (doctor.id.toString() == doctorId) {
+          filteredBranches = doctor.branches;
+          break;
+        }
+      }
+    });
+  }
+
+  bool _containsItemWithValue(
+      List items, String? value, String Function(dynamic) getId) {
+    if (value == null) return false;
+    return items.any((item) => getId(item) == value);
   }
 
   @override
   Widget build(BuildContext context) {
     final branchesProvider = Provider.of<FetchBranchesProvider>(context);
     final branches = branchesProvider.branchResponse?.data ?? [];
-    final doctoresprovider = Provider.of<FetchDoctorsDataProvider>(context);
-    final doctors = doctoresprovider.doctorsResponse?.data ?? [];
+    final doctorsProvider = Provider.of<FetchDoctorsDataProvider>(context);
+    final doctors = doctorsProvider.doctorsResponse?.data ?? [];
+
+    // Get unique doctors (remove duplicates by ID)
+    final uniqueDoctors = doctors
+        .fold<Map<int, dynamic>>({}, (map, doctor) {
+          map[doctor.id] = doctor;
+          return map;
+        })
+        .values
+        .toList();
+
+    // Get unique branches (remove duplicates by ID)
+    final uniqueBranches = branches
+        .fold<Map<int, dynamic>>({}, (map, branch) {
+          map[branch.id] = branch;
+          return map;
+        })
+        .values
+        .toList();
+
+    // Determine which lists to use for dropdowns
+    final branchesToShow =
+        filteredBranches.isNotEmpty ? filteredBranches : uniqueBranches;
+    final doctorsToShow =
+        filteredDoctors.isNotEmpty ? filteredDoctors : uniqueDoctors;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -81,9 +152,7 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_forward_ios),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
           ),
         ],
       ),
@@ -132,38 +201,50 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
               const SizedBox(height: 16),
               _buildDropdown(
                 label: "اختار الفرع",
-                value: _selectedBranchId,
+                value: _containsItemWithValue(branchesToShow, _selectedBranchId,
+                        (item) => item.id.toString())
+                    ? _selectedBranchId
+                    : null,
                 onChanged: (value) {
-                  setState(() {
-                    _selectedBranchId = value;
-                  });
+                  _selectedBranchId = value;
+                  _filterDoctorsByBranch(value!);
                 },
-                items: branches.map((branch) {
+                items: branchesToShow.map((branch) {
                   return DropdownMenuItem<String>(
-                    value: branch.id.toString(), // Store the ID
+                    value: branch.id.toString(),
                     child: Text(branch.name),
                   );
                 }).toList(),
               ),
               const SizedBox(height: 16),
-              if (doctors.isNotEmpty)
+              if (doctorsToShow.isNotEmpty)
                 _buildDropdown(
                   label: "اختار الطبيب",
-                  value: __selectedDoctorId,
+                  value: _containsItemWithValue(doctorsToShow,
+                          __selectedDoctorId, (item) => item.id.toString())
+                      ? __selectedDoctorId
+                      : null,
+
                   onChanged: widget.docid != null
-                      ? (_) {} // Provide a dummy function to make it non-null
+                      ? (_) {} // Disable dropdown if doctor is preselected
                       : (value) {
-                          setState(() {
-                            __selectedDoctorId = value;
-                          });
+                          __selectedDoctorId = value;
+                          _filterBranchesByDoctor(value!);
                         },
-                  items: doctors.map((doctor) {
+                  items: doctorsToShow.map((doctor) {
+                    String doctorName;
+                    if (doctor is Doctors) {
+                      doctorName = "${doctor.fname} ${doctor.lname}".trim();
+                    } else {
+                      doctorName = doctor.name;
+                    }
                     return DropdownMenuItem<String>(
                       value: doctor.id.toString(),
-                      child: Text("${doctor.fname} ${doctor.lname}"),
+                      child: Text(doctorName),
                     );
                   }).toList(),
-                  isEnabled: widget.docid == null, // <- Add this flag
+                  isEnabled:
+                      widget.docid == null, // Disable if doctor is preselected
                 ),
               const SizedBox(height: 32),
               Center(
@@ -205,10 +286,10 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
       _showError("الاسم بالكامل مطلوب");
       return;
     }
-    if (email.isEmpty || !_isValidEmail(email)) {
-      _showError("البريد الإلكتروني غير صالح أو فارغ");
-      return;
-    }
+    // if (!_isValidEmail(email)) {
+    //   _showError("البريد الإلكتروني غير صالح  ");
+    //   return;
+    // }
     if (phone.isEmpty || !_isValidPhone(phone)) {
       _showError("رقم الهاتف غير صالح أو فارغ");
       return;
@@ -267,12 +348,12 @@ class _MakeAppointmentScreenState extends State<MakeAppointmentScreen> {
         token: loginProvider.token!);
   }
 
-// Function to validate email
-  bool _isValidEmail(String email) {
-    final emailRegex =
-        RegExp(r"^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
-    return emailRegex.hasMatch(email);
-  }
+// // Function to validate email
+//   bool _isValidEmail(String email) {
+//     final emailRegex =
+//         RegExp(r"^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+//     return emailRegex.hasMatch(email);
+//   }
 
 // Function to validate phone number
   bool _isValidPhone(String phone) {

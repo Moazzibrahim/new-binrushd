@@ -1,13 +1,14 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'dart:convert';
+import 'package:binrushd_medical_center/view/screens/tabs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class MakeReservationProvider with ChangeNotifier {
   Future<void> sendPostRequest(
       {required String customerName,
-      required String email,
+       String? email,
       required String phone,
       required int isOffer,
       required int offerId,
@@ -23,7 +24,7 @@ class MakeReservationProvider with ChangeNotifier {
     // Prepare the request body as a JSON
     final Map<String, dynamic> requestBody = {
       'customerName': customerName,
-      'email': email,
+      // 'email': email,
       'phone': phone,
       'isOffer': isOffer,
       'offer_id': offerId,
@@ -57,7 +58,9 @@ class MakeReservationProvider with ChangeNotifier {
                 TextButton(
                   child: const Text("حسناً"),
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            const TabsScreen())); // Close the dialog
                   },
                 ),
               ],

@@ -9,35 +9,34 @@ class FetchBranchesProvider with ChangeNotifier {
   BranchResponse? _branchResponse;
   BranchResponse? get branchResponse => _branchResponse;
 
-  // Function to fetch branches data from the API
+  /// Fetch branch data from API and cache it using Hive
   Future<void> fetchBranches(BuildContext context) async {
-    final url = Uri.parse('https://binrushd.net/api/branch'); // API URL
+    final url = Uri.parse('https://binrushd.net/api/branch');
 
     try {
-      // Sending a GET request to the URL
       final response = await http.get(url, headers: {
         'Accept': 'application/json',
         // 'Authorization': 'Bearer $token',
       });
 
-      // Check if the response status is OK (200)
       if (response.statusCode == 200) {
-        // Parse the response body into the model
         final jsonResponse = json.decode(response.body);
-        _branchResponse =
-            BranchResponse.fromJson(jsonResponse); // Assigning to the response
 
-        Box<Branch> branchBox = Hive.box<Branch>('branches');
-        branchBox.clear(); // Optional: clear old data
-        for (var branch in jsonResponse['data']) {
-          final branchModel = Branch.fromJson(branch); // Convert Map to Branch
-          branchBox.put(branchModel.id, branchModel); // Save Branch object
+        // Convert JSON to BranchResponse
+        _branchResponse = BranchResponse.fromJson(jsonResponse);
+
+        // Open Hive box and store branches
+        final Box<Branch> branchBox = Hive.box<Branch>('branches');
+        await branchBox.clear(); // Clear old data
+
+        for (Branch branch in _branchResponse!.data) {
+          await branchBox.put(branch.id, branch);
         }
-        notifyListeners(); // Notify listeners about the change in data
+
+        notifyListeners();
       } else if (response.statusCode == 401) {
-        // Handle unauthorized access (token expired or invalid)
         log('Unauthorized access. Please log in again.');
-        // Optionally navigate to the login screen or show a message
+        // Handle re-authentication if needed
       } else {
         log('Failed to load branches. Status code: ${response.statusCode}');
         throw Exception('Failed to load branches');
@@ -48,13 +47,16 @@ class FetchBranchesProvider with ChangeNotifier {
     }
   }
 
+  /// Load branches from Hive (cache)
   Future<void> loadCachedBranches() async {
     final branchBox = Hive.box<Branch>('branches');
     final cachedBranches = branchBox.values.toList();
 
     if (cachedBranches.isNotEmpty) {
       _branchResponse = BranchResponse(
-          data: cachedBranches, message: 'Cached branches loaded');
+        message: 'Cached branches loaded',
+        data: cachedBranches,
+      );
       notifyListeners();
     }
   }

@@ -30,7 +30,7 @@ class BranchData {
   String email;
   String image;
   List<Department> departments;
-  DoctorData doctors;
+  List<Doctor> doctors;
 
   BranchData({
     required this.id,
@@ -52,15 +52,16 @@ class BranchData {
       name: json['name'],
       brief: json['brief'],
       address: json['address'],
-      latitude: json['latitude'],
-      longitude: json['longitude'],
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
       worktimes: WorkTimes.fromJson(json['worktimes']),
       email: json['email'],
       image: json['image'],
       departments: (json['departments'] as List)
           .map((e) => Department.fromJson(e))
           .toList(),
-      doctors: DoctorData.fromJson(json['doctors']),
+      doctors:
+          (json['doctors'] as List).map((e) => Doctor.fromJson(e)).toList(),
     );
   }
 
@@ -76,7 +77,7 @@ class BranchData {
       'email': email,
       'image': image,
       'departments': departments.map((e) => e.toJson()).toList(),
-      'doctors': doctors.toJson(),
+      'doctors': doctors.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -157,146 +158,66 @@ class Department {
   }
 }
 
-class DoctorData {
-  List<Doctor> data;
-  DoctorLinks links;
-  DoctorMeta meta;
-
-  DoctorData({
-    required this.data,
-    required this.links,
-    required this.meta,
-  });
-
-  factory DoctorData.fromJson(Map<String, dynamic> json) {
-    return DoctorData(
-      data: (json['data'] as List).map((e) => Doctor.fromJson(e)).toList(),
-      links: DoctorLinks.fromJson(json['links']),
-      meta: DoctorMeta.fromJson(json['meta']),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'data': data.map((e) => e.toJson()).toList(),
-      'links': links.toJson(),
-      'meta': meta.toJson(),
-    };
-  }
-}
-
 class Doctor {
   int id;
-  String fname;
-  String lname;
+  String? name;
+  String? gender;
+  String? qualifications;
+  String? experience;
   String speciality;
+  String? degree;
   String? phone;
   String? email;
+  String? brief;
   String image;
+  String? highlighted;
 
   Doctor({
     required this.id,
-    required this.fname,
-    required this.lname,
+    this.name,
+    this.gender,
+    this.qualifications,
+    this.experience,
     required this.speciality,
+    this.degree,
     this.phone,
     this.email,
+    this.brief,
     required this.image,
+    this.highlighted,
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
     return Doctor(
       id: json['id'],
-      fname: json['fname'],
-      lname: json['lname'],
+      name: json['name'],
+      gender: json['Gender'],
+      qualifications: json['qualifications'],
+      experience: json['experience'],
       speciality: json['Speciality'],
+      degree: json['Degree'],
       phone: json['phone'],
       email: json['email'],
+      brief: json['brief'],
       image: json['image'],
+      highlighted: json['highligthed'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'fname': fname,
-      'lname': lname,
+      'name': name,
+      'Gender': gender,
+      'qualifications': qualifications,
+      'experience': experience,
       'Speciality': speciality,
+      'Degree': degree,
       'phone': phone,
       'email': email,
+      'brief': brief,
       'image': image,
-    };
-  }
-}
-
-class DoctorLinks {
-  String first;
-  String last;
-  String? prev;
-  String? next;
-
-  DoctorLinks({
-    required this.first,
-    required this.last,
-    this.prev,
-    this.next,
-  });
-
-  factory DoctorLinks.fromJson(Map<String, dynamic> json) {
-    return DoctorLinks(
-      first: json['first'],
-      last: json['last'],
-      prev: json['prev'],
-      next: json['next'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'first': first,
-      'last': last,
-      'prev': prev,
-      'next': next,
-    };
-  }
-}
-
-class DoctorMeta {
-  int currentPage;
-  int from;
-  int lastPage;
-  int perPage;
-  int to;
-  int total;
-
-  DoctorMeta({
-    required this.currentPage,
-    required this.from,
-    required this.lastPage,
-    required this.perPage,
-    required this.to,
-    required this.total,
-  });
-
-  factory DoctorMeta.fromJson(Map<String, dynamic> json) {
-    return DoctorMeta(
-      currentPage: json['current_page'],
-      from: json['from'],
-      lastPage: json['last_page'],
-      perPage: json['per_page'],
-      to: json['to'],
-      total: json['total'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'current_page': currentPage,
-      'from': from,
-      'last_page': lastPage,
-      'per_page': perPage,
-      'to': to,
-      'total': total,
+      'highligthed': highlighted,
     };
   }
 }
