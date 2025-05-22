@@ -57,7 +57,7 @@ class MyAppointmentsScreen extends StatelessWidget {
           : Consumer<LoginProvider>(
               builder: (context, provider, child) {
                 final reservations =
-                    provider.loginResponse?.data.user.reservations ?? [];
+                    provider.loginResponse?.data!.user.reservations ?? [];
                 if (reservations.isEmpty) {
                   return const Center(
                     child: Text(

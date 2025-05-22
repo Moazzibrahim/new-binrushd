@@ -67,7 +67,7 @@ class MyFavouritesScreen extends StatelessWidget {
                 }
 
                 final favourites =
-                    provider.loginResponse?.data.user.favourites ?? [];
+                    provider.loginResponse?.data!.user.favourites ?? [];
                 if (favourites.isEmpty) {
                   return const Center(
                     child: Text(

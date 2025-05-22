@@ -3,6 +3,7 @@ import 'package:binrushd_medical_center/controller/Auth/login_provider.dart';
 import 'package:binrushd_medical_center/controller/profile_provider.dart';
 import 'package:binrushd_medical_center/view/screens/branches/branch_details_screen.dart';
 import 'package:binrushd_medical_center/view/screens/doctors/doctor_details_screen.dart';
+import 'package:binrushd_medical_center/view/screens/offers/offers_screen.dart';
 import 'package:binrushd_medical_center/view/screens/specializies/specializies_details_screen.dart';
 import 'package:binrushd_medical_center/view/widgets/filter_button_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -155,84 +156,92 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Consumer<FetchOffersProvider>(
-                builder: (context, provider, child) {
-                  if (provider.offersResponse == null) {
-                    provider.fetchOffers(context);
-                    return const Center(child: CircularProgressIndicator());
-                  }
+  builder: (context, provider, child) {
+    if (provider.offersResponse == null) {
+      provider.fetchOffers(context);
+      return const Center(child: CircularProgressIndicator());
+    }
 
-                  // Combine both offers and campaigns
-                  final allImages = [
-                    ...provider.offersResponse!.data.offers.map((e) => e.image),
-                    ...provider.offersResponse!.data.campaigns
-                        .map((e) => e.image),
-                  ];
+    // Combine both offers and campaigns
+    final allImages = [
+      ...provider.offersResponse!.data.offers.map((e) => e.image),
+      ...provider.offersResponse!.data.campaigns.map((e) => e.image),
+    ];
 
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CarouselSlider(
-                        options: CarouselOptions(
-                          height: 170.0,
-                          enlargeCenterPage: false,
-                          autoPlay: true,
-                          viewportFraction: 1.0,
-                          autoPlayInterval: const Duration(seconds: 7),
-                          autoPlayAnimationDuration:
-                              const Duration(milliseconds: 1000),
-                          autoPlayCurve: Curves.fastOutSlowIn,
-                          pauseAutoPlayOnTouch: true,
-                          scrollDirection: Axis.horizontal,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
-                        ),
-                        items: allImages
-                            .map(
-                              (imageUrl) => Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  image: DecorationImage(
-                                    image: NetworkImage(imageUrl),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            )
-                            .toList(),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CarouselSlider(
+          options: CarouselOptions(
+            height: 170.0,
+            enlargeCenterPage: false,
+            autoPlay: true,
+            viewportFraction: 1.0,
+            autoPlayInterval: const Duration(seconds: 7),
+            autoPlayAnimationDuration:
+                const Duration(milliseconds: 1000),
+            autoPlayCurve: Curves.fastOutSlowIn,
+            pauseAutoPlayOnTouch: true,
+            scrollDirection: Axis.horizontal,
+            onPageChanged: (index, reason) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+          ),
+          items: allImages
+              .map(
+                (imageUrl) => GestureDetector(
+                  onTap: () {
+                    // انتقل إلى صفحة العروض
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const OffersScreen(),
                       ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: allImages.asMap().entries.map((entry) {
-                          return GestureDetector(
-                            onTap: () => setState(() {
-                              _currentIndex = entry.key;
-                            }),
-                            child: Container(
-                              width: 8.0,
-                              height: 8.0,
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 8.0, horizontal: 4.0),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: (Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? Colors.white
-                                        : backgroundColor)
-                                    .withOpacity(
-                                        _currentIndex == entry.key ? 0.9 : 0.4),
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      image: DecorationImage(
+                        image: NetworkImage(imageUrl),
+                        fit: BoxFit.cover,
                       ),
-                    ],
-                  );
-                },
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: allImages.asMap().entries.map((entry) {
+            return GestureDetector(
+              onTap: () => setState(() {
+                _currentIndex = entry.key;
+              }),
+              child: Container(
+                width: 8.0,
+                height: 8.0,
+                margin: const EdgeInsets.symmetric(
+                    vertical: 8.0, horizontal: 4.0),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: (Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : backgroundColor)
+                      .withOpacity(_currentIndex == entry.key ? 0.9 : 0.4),
+                ),
               ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  },
+),
               const SizedBox(
                 height: 10,
               ),

@@ -90,7 +90,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
               final doctor = doctorsResponse.data;
 
-              final isFavorite = _favoriteIndices.contains(doctor.id);
+              final isFavorite = _favoriteIndices.contains(doctor!.id);
 
               return Directionality(
                 textDirection: TextDirection.rtl,
@@ -149,7 +149,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                               setState(() {
                                                 isFavourite =
                                                     true; // Update the favorite state
-                                                _favoriteIndices.add(doctor.id);
+                                                _favoriteIndices
+                                                    .add(doctor.id!);
                                               });
                                             }
                                           } catch (e) {
@@ -168,8 +169,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                       ),
                                       CircleAvatar(
                                         radius: 30,
-                                        backgroundImage: doctor.image.isNotEmpty
-                                            ? NetworkImage(doctor.image)
+                                        backgroundImage: doctor
+                                                .image!.isNotEmpty
+                                            ? NetworkImage(doctor.image!)
                                             : const AssetImage(
                                                     'assets/images/default_avatar.png')
                                                 as ImageProvider,
@@ -178,7 +180,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                   ),
                                   const SizedBox(height: 5),
                                   Text(
-                                    doctor.speciality,
+                                    doctor.speciality!,
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: backgroundColor,
@@ -193,7 +195,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                             _buildSectionTitle("نبذة:", primaryColor),
                             const SizedBox(height: 4),
                             Text(
-                              doctor.brief,
+                              doctor.brief!,
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.black87,
@@ -214,7 +216,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                             _buildSectionTitle("الدرجة العلمية:", primaryColor),
                             const SizedBox(height: 4),
                             Text(
-                              doctor.degree,
+                              doctor.degree!,
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.black87,
@@ -224,7 +226,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                             _buildSectionTitle("الفروع:", primaryColor),
                             const SizedBox(height: 4),
                             Text(
-                              doctor.branches.first.name,
+                              doctor.branches!.first.name!,
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.black87,

@@ -1,23 +1,24 @@
 class LoginResponse {
   final String message;
-  final UserData data;
+  final UserData? data;
 
-  LoginResponse({required this.message, required this.data});
+  LoginResponse({required this.message, this.data});
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
-      message: json['message'],
-      data: UserData.fromJson(json['data']),
+      message: json['message'] ?? '',
+      data: json['data'] is Map<String, dynamic> ? UserData.fromJson(json['data']) : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'message': message,
-      'data': data.toJson(),
+      'data': data?.toJson(),
     };
   }
 }
+
 
 class UserData {
   final User user;
@@ -78,11 +79,12 @@ class User {
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       token: json['token'],
-      reservations: (json['reservations'] as List)
+      reservations: (json['reservations'] as List? ?? [])
           .map((e) => Reservation.fromJson(e))
           .toList(),
-      favourites:
-          (json['favorites'] as List).map((e) => Favorite.fromJson(e)).toList(),
+      favourites: (json['favorites'] as List? ?? [])
+          .map((e) => Favorite.fromJson(e))
+          .toList(),
     );
   }
 
@@ -104,6 +106,7 @@ class User {
   }
 }
 
+
 class Reservation {
   final int id;
   final Customer customer;
@@ -120,7 +123,7 @@ class Reservation {
     required this.isOffer,
     required this.offer,
     required this.branch,
-    required this.doctor,
+    this.doctor,
   });
 
   factory Reservation.fromJson(Map<String, dynamic> json) {
@@ -131,7 +134,9 @@ class Reservation {
       isOffer: json['isOffer'],
       offer: Offer.fromJson(json['offer']),
       branch: Branch.fromJson(json['branch']),
-      doctor: json['doctor'],
+      doctor: json['doctor'] != null && json['doctor'] is Map<String, dynamic>
+          ? Doctor.fromJson(json['doctor'])
+          : null,
     );
   }
 
@@ -143,10 +148,11 @@ class Reservation {
       'isOffer': isOffer,
       'offer': offer.toJson(),
       'branch': branch.toJson(),
-      'doctor': doctor,
+      'doctor': doctor?.toJson(),
     };
   }
 }
+
 
 class Customer {
   final String name;
@@ -312,11 +318,11 @@ class Doctor {
   final int? highlighted;
 
   Doctor({
-    required this.id,
-    required this.fname,
-    required this.lname,
-    required this.image,
-    required this.highlighted,
+    this.id,
+    this.fname,
+    this.lname,
+    this.image,
+    this.highlighted,
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
@@ -325,7 +331,7 @@ class Doctor {
       fname: json['fname'],
       lname: json['lname'],
       image: json['image'],
-      highlighted: json['highligthed'],
+      highlighted: json['highlighted'], // FIXED KEY
     );
   }
 
@@ -335,10 +341,11 @@ class Doctor {
       'fname': fname,
       'lname': lname,
       'image': image,
-      'highligthed': highlighted,
+      'highlighted': highlighted,
     };
   }
 }
+
 
 class Favorite {
   final String fname;

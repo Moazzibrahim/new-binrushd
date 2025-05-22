@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 class MakeReservationProvider with ChangeNotifier {
   Future<void> sendPostRequest(
       {required String customerName,
-       String? email,
+      String? email,
       required String phone,
       required int isOffer,
       required int offerId,
@@ -47,6 +47,7 @@ class MakeReservationProvider with ChangeNotifier {
       // Check for a successful response
       if (response.statusCode == 200) {
         print('Request successful: ${response.body}');
+        print("doc id: $docId");
         // Handle the response if needed
         showDialog(
           context: context!,
