@@ -247,109 +247,6 @@ class _HomePageState extends State<HomePage> {
               ),
               Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SpecialistsScreen()));
-                        },
-                        child: Text(
-                          "استعراض الكل",
-                          style: TextStyle(
-                              color: backgroundColor,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                      const Text(
-                        "التخصصات",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Consumer<FetchDepartmentsProvider>(
-                    builder: (context, fetchDepartmentsProvider, child) {
-                      final departmentResponse =
-                          fetchDepartmentsProvider.departmentResponse;
-                      if (departmentResponse == null) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      final departments = departmentResponse.data;
-
-                      return SizedBox(
-                        height: 80,
-                        child: ListView.builder(
-                          reverse: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: departments.length,
-                          itemBuilder: (context, index) {
-                            final department = departments[index];
-
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(
-                                          10), // Adjust the value for the desired roundness
-                                    ),
-                                    height: 50,
-                                    width: 70,
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SpecializiesDetailsScreen(
-                                                      depid: department.id,
-                                                      depimage:
-                                                          department.image,
-                                                    )));
-                                      },
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                            10), // Match the container's border radius
-                                        child: Image.network(
-                                          department.image,
-                                          fit: BoxFit
-                                              .cover, // Ensure the image fits well within the container
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    department.name,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 12),
-                                  ), // Use index to get the text
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -819,6 +716,106 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(
                 height: 20,
               ),
+               Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const SpecialistsScreen()));
+                        },
+                        child: Text(
+                          "استعراض الكل",
+                          style: TextStyle(
+                              color: backgroundColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const Text(
+                        "التخصصات",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Consumer<FetchDepartmentsProvider>(
+                    builder: (context, fetchDepartmentsProvider, child) {
+                      final departmentResponse =
+                          fetchDepartmentsProvider.departmentResponse;
+                      if (departmentResponse == null) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      final departments = departmentResponse.data;
+                      return SizedBox(
+                        height: 80,
+                        child: ListView.builder(
+                          reverse: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: departments.length,
+                          itemBuilder: (context, index) {
+                            final department = departments[index];
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(
+                                          10), // Adjust the value for the desired roundness
+                                    ),
+                                    height: 50,
+                                    width: 70,
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SpecializiesDetailsScreen(
+                                                      depid: department.id,
+                                                      depimage:
+                                                          department.image,
+                                                    )));
+                                      },
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                            10), // Match the container's border radius
+                                        child: Image.network(
+                                          department.image,
+                                          fit: BoxFit
+                                              .cover, // Ensure the image fits well within the container
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    department.name,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ), // Use index to get the text
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
